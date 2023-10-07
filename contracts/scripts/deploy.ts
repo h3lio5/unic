@@ -1,21 +1,18 @@
 import { ethers } from "hardhat";
 
+// const RPC_URL = "https://eth-sepolia.g.alchemy.com/v2/1hwl8jpKitPSSAco4MBF-KQYgLY6Hwy4";
+const RPC_URL = "https://eth-goerli.g.alchemy.com/v2/2PwQzqxejp-6sea6sRsT9ac7fYIQrBqM";
+
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  const pk = process.env.PRIVATE_KEY;
+  const provider = new ethers.JsonRpcProvider(RPC_URL);
+  const wallet = new ethers.Wallet(pk as string, provider);
+  const unicRegistry = await ethers.deployContract("UnicRegistry", wallet); 
 
-  const lockedAmount = ethers.parseEther("0.001");
-
-  const lock = await ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
-
-  await lock.waitForDeployment();
+  await unicRegistry.waitForDeployment();
 
   console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
+    `UnicRegistry deployed to ${unicRegistry.target}`
   );
 }
 
